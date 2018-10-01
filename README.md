@@ -27,3 +27,6 @@
 #### Protocols:
 - [https://www.amqp.org/](https://www.amqp.org/)
 - [https://mqtt.org/](https://mqtt.org/)
+
+#### Documentation Generator
+- [http://apidocjs.com/](http://apidocjs.com/)
