@@ -4,7 +4,9 @@
     "password": "XhAQrX#$ZMv8!a86AB4QUcyI9k2yy^S^NQMHC8k3asw3*S$7ie",
     "database": "slack",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "postgres",
+    "logging": false,
+    "operatorsAliases": false
   },
   "test": {
     "username": "root",
@@ -18,6 +20,8 @@
     "password": "XhAQrX#$ZMv8!a86AB4QUcyI9k2yy^S^NQMHC8k3asw3*S$7ie",
     "database": "slack",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "postgres",
+    "logging": false,
+    "operatorsAliases": false
   }
 }
