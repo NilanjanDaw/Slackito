@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-10-04T17:33:45+05:30
+ * @Last modified time: 2018-10-04T17:39:53+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -93,7 +93,6 @@ router.post('/password/set', function (req, res, next) {
             email_id, workspace_id
           }
         }).then(user =>{
-          console.log(user);
           res.json({
             status: "successs"
           })
