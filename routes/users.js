@@ -4,37 +4,43 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-10-04T16:25:13+05:30
+ * @Last modified time: 2018-10-04T17:33:45+05:30
  * @Copyright: Nilanjan Daw
  */
 
 
 
-var express = require('express');
+const express = require('express');
 const models = require('.././models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('.././config');
-var router = express.Router();
+let router = express.Router();
 
 router.post('/login', function (req, res, next) {
   let password = req.body.password
-  let username = req.body.username
+  let email_id = req.body.email_id
   let workspace_id = req.body.workspace_id
-  if(username && password && workspace_id){
+  if(email_id && password && workspace_id){
     models.user.findOne({
       where: {
-        username, workspace_id
+        email_id, workspace_id
       }
     }).then(user => {
       bcrypt.compare(password, user.password, function(err, result) {
         if (result) {
-          var payload = {
-            username: user.username,
+          let payload = {
+            email_id: user.email_id,
             workspace_id: user.workspace_id
           };
-          var token = jwt.sign(payload, config.jwt_secret);
-          res.status(200).json({status: "success", token: token});
+          let token = jwt.sign(payload, config.jwt_secret);
+          res.status(200).json({
+            status: "success",
+            email_id: user.email_id,
+            workspace_id: user.workspace_id,
+            username: user.username,
+            token: token
+          });
         } else {
           res.status(401).json({status: "authentication failed"})
         }
@@ -48,7 +54,62 @@ router.post('/login', function (req, res, next) {
 })
 
 router.post('/register', function (req, res, next) {
-  
+  let username = req.body.username
+  let workspace_id = req.body.workspace_id
+  let email_id = req.body.email_id
+  if(username && workspace_id && email_id){
+    models.user.create({
+      username, workspace_id, email_id
+    }).then(user => {
+      res.json({
+        status: "success",
+        user
+      })
+    }).catch(error => {
+      console.log(error);
+      res.status(400).json({
+        status: "failed",
+        message: "user account not created"
+      })
+    })
+  } else {
+    res.status(400).json({
+      status: "failed",
+      message: "bad request"
+    })
+  }
+})
+
+router.post('/password/set', function (req, res, next) {
+  if(req.body.email_id && req.body.workspace_id && req.body.password){
+    let email_id = req.body.email_id;
+    let password = req.body.password;
+    let workspace_id = req.body.workspace_id;
+    bcrypt.hash(password, config.salt_rounds, function(err, hash) {
+        models.user.update({
+          password: hash
+        }, {
+            where: {
+            email_id, workspace_id
+          }
+        }).then(user =>{
+          console.log(user);
+          res.json({
+            status: "successs"
+          })
+        }).catch(error => {
+          console.log(error);
+          res.status(400).json({
+            status: "failed",
+            message: "unable to set password"})
+        })
+    });
+  } else {
+    res.status(400).json({
+      status: "failed",
+      message: "bad request"
+    })
+  }
 })
 
 module.exports = router;

@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: app.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-10-04T15:53:08+05:30
+ * @Last modified time: 2018-10-04T17:12:37+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -23,6 +23,7 @@ const config = require('./config.json');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var workspaceRouter = require('./routes/workspace');
 
 var app = express();
 
@@ -37,7 +38,8 @@ var strategy = new JwtStrategy(
   jwtOptions, function (jwt_payload, next) {
       models.user.findOne({
         where: {
-          username: jwt_payload.username
+          email_id: jwt_payload.email_id,
+          workspace_id: jwt_payload.workspace_id
         }
       }).then(user => {
         next(null, user)
@@ -62,6 +64,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/workspaces', workspaceRouter);
 
 
 // catch 404 and forward to error handler
