@@ -4,20 +4,20 @@
     "password": "XhAQrX#$ZMv8!a86AB4QUcyI9k2yy^S^NQMHC8k3asw3*S$7ie",
     "database": "slack",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "mysql"
   },
   "test": {
     "username": "root",
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "mysql"
   },
   "production": {
     "username": "slack",
     "password": "XhAQrX#$ZMv8!a86AB4QUcyI9k2yy^S^NQMHC8k3asw3*S$7ie",
     "database": "slack",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "mysql"
   }
 }
