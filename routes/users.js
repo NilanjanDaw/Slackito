@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-04T03:15:50+05:30
+ * @Last modified time: 2018-11-04T03:21:47+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -29,9 +29,9 @@ let transporter = nodemailer.createTransport({
 router.post('/confirm', function (req, res, next) {
   let token = jwt.sign(req.body.email_id, config.jwt_secret);
   const mailOptions = {
-    from: 'slackitoslack@gmail.com', // sender address
-    to: req.body.email_id, // list of receivers
-    subject: 'Email Verification for Slackito', // Subject line
+    from: 'slackitoslack@gmail.com',
+    to: req.body.email_id,
+    subject: 'Email Verification for Slackito',
     html: `<p>Please click on the link here http://10.1.192.9:3000/users/verify?token=${token}</p>`,// plain text body
   };
 
