@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: app.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-10-04T17:12:37+05:30
+ * @Last modified time: 2018-11-04T02:50:40+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -31,7 +31,7 @@ var ExtractJwt = passportJWT.ExtractJwt;
 var JwtStrategy = passportJWT.Strategy;
 
 var jwtOptions = {}
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
+jwtOptions.jwtFromRequest = ExtractJwt.fromUrlQueryParameter("token");
 jwtOptions.secretOrKey = config.jwt_secret;
 
 var strategy = new JwtStrategy(

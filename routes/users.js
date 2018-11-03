@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-10-04T17:39:53+05:30
+ * @Last modified time: 2018-11-04T03:15:50+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -14,8 +14,74 @@ const express = require('express');
 const models = require('.././models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 const config = require('.././config');
 let router = express.Router();
+
+let transporter = nodemailer.createTransport({
+ service: 'gmail',
+ auth: {
+        user: 'slackitoslack@gmail.com',
+        pass: 'cs699slack'
+    }
+});
+
+router.post('/confirm', function (req, res, next) {
+  let token = jwt.sign(req.body.email_id, config.jwt_secret);
+  const mailOptions = {
+    from: 'slackitoslack@gmail.com', // sender address
+    to: req.body.email_id, // list of receivers
+    subject: 'Email Verification for Slackito', // Subject line
+    html: `<p>Please click on the link here http://10.1.192.9:3000/users/verify?token=${token}</p>`,// plain text body
+  };
+
+  transporter.sendMail(mailOptions, function (err, info) {
+     if(err) {
+       console.log(err);
+       res.json({
+         "status": "failed",
+         "message": err
+       })
+     }
+     else {
+       res.json({
+         "status": "success"
+       })
+       console.log(info);
+     }
+   });
+})
+
+router.get('/verify', function (req, res, next) {
+  jwt.verify(req.query.token, config.jwt_secret, function(err, decoded) {
+    if (err) {
+      res.status(401).json({
+        status: "authentication failed"
+      })
+    } else {
+      models.user.findAll({
+        where: {
+          email_id: decoded
+        },
+        attributes: ['workspace_id', 'username']
+      }).then(users => {
+        data = []
+        for (user of users) {
+          data.push(user.dataValues)
+        }
+        res.json({
+          status: "success",
+          details: data
+        })
+      }).catch(err => {
+        console.log(err);
+        res.status(500)
+      })
+    }
+  });
+})
+
+
 
 router.post('/login', function (req, res, next) {
   let password = req.body.password
