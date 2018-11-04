@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-04T15:11:27+05:30
+ * @Last modified time: 2018-11-04T17:30:10+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -135,9 +135,13 @@ router.post('/register', function (req, res, next) {
       models.user.create({
         username, workspace_id, email_id, password
       }).then(user => {
+        let token = jwt.sign(payload, config.jwt_secret);
         res.json({
           status: "success",
-          user
+          email_id: user.email_id,
+          workspace_id: user.workspace_id,
+          username: user.username,
+          token
         })
       }).catch(error => {
         console.log(error);

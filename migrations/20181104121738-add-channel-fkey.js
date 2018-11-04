@@ -1,10 +1,10 @@
 /**
  * @Author: nilanjan
- * @Date:   2018-10-04T16:34:32+05:30
+ * @Date:   2018-11-04T17:47:38+05:30
  * @Email:  nilanjandaw@gmail.com
- * @Filename: 20181004110432-add-workspace-fkey.js
+ * @Filename: 20181104121738-add-channel-fkey.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-04T18:28:21+05:30
+ * @Last modified time: 2018-11-04T18:29:05+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -14,9 +14,9 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    queryInterface.addConstraint('users', ['workspace_id'], {
+    queryInterface.addConstraint('channels', ['workspace_id'], {
       type: 'foreign key',
-      name: 'fk_workspace_id',
+      name: 'fk_channel',
       references: {
         table: 'workspaces',
         field: 'workspace_id',
@@ -27,6 +27,6 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    queryInterface.removeConstraint('users', 'fk_workspace_id')
+    queryInterface.removeConstraint('channels', 'fk_channel')
   }
 };
