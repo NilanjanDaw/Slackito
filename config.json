@@ -2,5 +2,5 @@
   "signature": "t2z2j3m5n6p8r9s3z3k4m5p7q8r2y2j3k4n6p7q9s2z2j4m5n6q8r9s3z3k4m5p7q8r2y2j3k5n6p7q9s2z2j4m5n6q8r9s3z3k4",
   "jwt_secret": "2j3m5n6p8r9s3k4m5p7q8r9t2j3k4n6p7q9s2j4m5n6p8r9s3k4m5p7q8r2j3k4n6p7q9s2j4m5n6q8r9s3k4m5p7q8r2j3k5n6p",
   "salt_rounds": 10,
-  "server_url": "127.0.0.1:3000"
+  "server_url": "192.168.43.37:3000"
 }

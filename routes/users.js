@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-04T03:21:47+05:30
+ * @Last modified time: 2018-11-04T15:11:27+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -32,7 +32,7 @@ router.post('/confirm', function (req, res, next) {
     from: 'slackitoslack@gmail.com',
     to: req.body.email_id,
     subject: 'Email Verification for Slackito',
-    html: `<p>Please click on the link here http://10.1.192.9:3000/users/verify?token=${token}</p>`,// plain text body
+    html: `<p>Please click on the link here http://${config.server_url}/users/verify?token=${token}</p>`,// plain text body
   };
 
   transporter.sendMail(mailOptions, function (err, info) {
@@ -69,9 +69,15 @@ router.get('/verify', function (req, res, next) {
         for (user of users) {
           data.push(user.dataValues)
         }
+
+        let token = jwt.sign({
+          email_id: req.body.email_id,
+          confirm: true
+        }, config.jwt_secret);
         res.json({
           status: "success",
-          details: data
+          details: data,
+          token
         })
       }).catch(err => {
         console.log(err);
@@ -123,19 +129,22 @@ router.post('/register', function (req, res, next) {
   let username = req.body.username
   let workspace_id = req.body.workspace_id
   let email_id = req.body.email_id
-  if(username && workspace_id && email_id){
-    models.user.create({
-      username, workspace_id, email_id
-    }).then(user => {
-      res.json({
-        status: "success",
-        user
-      })
-    }).catch(error => {
-      console.log(error);
-      res.status(400).json({
-        status: "failed",
-        message: "user account not created"
+  let password = req.body.password
+  if(username && workspace_id && email_id && password) {
+    bcrypt.hash(password, config.salt_rounds, function(err, hash) {
+      models.user.create({
+        username, workspace_id, email_id, password
+      }).then(user => {
+        res.json({
+          status: "success",
+          user
+        })
+      }).catch(error => {
+        console.log(error);
+        res.status(400).json({
+          status: "failed",
+          message: "user account not created"
+        })
       })
     })
   } else {
