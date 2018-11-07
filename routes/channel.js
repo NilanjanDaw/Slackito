@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: channel.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-04T18:06:31+05:30
+ * @Last modified time: 2018-11-08T01:24:08+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -16,7 +16,7 @@
 router.post('/new', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   models.channel.create({
     channel_name: req.body.channel_name,
-    workspace_id: req.body.workspace_id
+    workspace_id: req.user.workspace_id
   }).then(channel => {
     res.json({
       status: "success",
@@ -32,7 +32,7 @@ router.post('/new', passport.authenticate('jwt', { session: false }), function (
 router.get('/list', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   models.channel.findAll({
     where: {
-      workspace_id: req.query.workspace_id
+      workspace_id: req.user.dataValues.workspace_id
     }
   }).then(channels => {
     data = []

@@ -4,13 +4,14 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: workspace.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-04T14:34:59+05:30
+ * @Last modified time: 2018-11-08T00:37:40+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
  const models = require('.././models');
  var router = express.Router();
  const config = require('.././config');
+ const bcrypt = require('bcrypt');
  const jwt = require('jsonwebtoken');
 
 router.post('/new', function (req, res, next) {
@@ -43,6 +44,7 @@ router.post('/new', function (req, res, next) {
             })
           });
         }).catch(err => {
+          console.log(err);
           res.status(400).json({
             status: "failed"
           })

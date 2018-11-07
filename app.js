@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: app.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-04T02:50:40+05:30
+ * @Last modified time: 2018-11-08T01:22:14+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -21,10 +21,12 @@ var passportJWT = require("passport-jwt");
 var helmet = require('helmet');
 const config = require('./config.json');
 var broker = require('./broker')
+const models = require('./models');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var workspaceRouter = require('./routes/workspace');
+var channelRouter = require('./routes/channel');
 
 var app = express();
 
@@ -66,7 +68,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/workspaces', workspaceRouter);
-
+app.use('/channels', channelRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
