@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: broker.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-08T05:08:04+05:30
+ * @Last modified time: 2018-11-08T22:08:54+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -35,7 +35,7 @@ var authenticate = function(client, username, password, callback) {
       if (err)
         callback(null, false)
       else {
-        client.workspace_id = decoded.workspace_id
+        client.user = decoded
         callback(null, true);
       }
     })
@@ -45,11 +45,14 @@ var authenticate = function(client, username, password, callback) {
 }
 
 var authorizePublish = function(client, topic, payload, callback) {
-  callback(null, client.workspace_id === topic.split('/')[0]);
+  payload = JSON.parse(payload.toString())
+  callback(null, client.user.workspace_id === topic.split('/')[0] &&
+                 client.user.username === payload.from &&
+                 client.user.workspace_id === payload.workspace_id);
 }
 
 var authorizeSubscribe = function(client, topic, callback) {
-  callback(null, client.workspace_id === topic.split('/')[0]);
+  callback(null, client.user.workspace_id === topic.split('/')[0]);
 }
 
 var server = new mosca.Server(moscaSettings);
@@ -68,11 +71,10 @@ server.on('published', function(packet, client) {
   if (!packet.topic.startsWith("$SYS/")) {
     let payload = packet.payload.toString()
     payload = JSON.parse(payload)
-    console.log('Published', packet.topic, payload);
     models.message
       .create(payload)
-      .then(message => {
-        console.log(message.dataValues);
+      .catch(err => {
+        console.log(err);
       })
   }
 });

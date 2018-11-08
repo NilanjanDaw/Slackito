@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-08T01:16:45+05:30
+ * @Last modified time: 2018-11-08T21:37:00+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -103,7 +103,8 @@ router.post('/login', function (req, res, next) {
         if (result) {
           let payload = {
             email_id: user.email_id,
-            workspace_id: user.workspace_id
+            workspace_id: user.workspace_id,
+            username: user.username
           };
           let token = jwt.sign(payload, config.jwt_secret);
           res.status(200).json({
@@ -137,7 +138,8 @@ router.post('/register', function (req, res, next) {
       }).then(user => {
         let payload = {
           email_id: user.email_id,
-          workspace_id: user.workspace_id
+          workspace_id: user.workspace_id,
+          username: user.username
         };
         let token = jwt.sign(payload, config.jwt_secret);
         res.json({
