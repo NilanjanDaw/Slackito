@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: 20181104124808-create-message.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-08T04:17:55+05:30
+ * @Last modified time: 2018-11-10T00:13:22+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -16,9 +16,8 @@ module.exports = {
     return queryInterface.createTable('messages', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
       to: {
         type: Sequelize.STRING

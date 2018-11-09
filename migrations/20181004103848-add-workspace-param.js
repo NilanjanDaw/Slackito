@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: 20181004103848-add-workspace-param.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-10-04T16:45:15+05:30
+ * @Last modified time: 2018-11-10T00:04:16+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -19,8 +19,8 @@ module.exports = {
       allowNull: false
     })
     queryInterface.addConstraint('users', ['workspace_id', 'email_id'] , {
-      type: 'primary key',
-      name: 'users_pkey_constraint'
+      type: 'unique',
+      name: 'unique_users_constraint'
     })
     queryInterface.addConstraint('users', ['workspace_id', 'username'], {
       type: 'unique',
@@ -29,7 +29,7 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    queryInterface.removeConstraint('users', 'users_pkey')
+    queryInterface.removeConstraint('users', 'unique_users_constraint')
     queryInterface.removeConstraint('users', 'unique_username_constraint')
     queryInterface.removeColumn('users', 'workspace_id')
   }

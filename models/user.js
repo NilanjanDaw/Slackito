@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: user.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-10-04T16:30:54+05:30
+ * @Last modified time: 2018-11-10T00:10:33+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -25,11 +25,14 @@ module.exports = (sequelize, DataTypes) => {
       unique: 'unique_username_constraint'
     },
     email_id: {
-      type: DataTypes.STRING,
-      primaryKey: true
+      type: DataTypes.STRING
     },
     name: DataTypes.STRING,
-    password: DataTypes.STRING
+    password: DataTypes.STRING,
+    is_admin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    }
   }, {});
   user.associate = function(models) {
     // associations can be defined here

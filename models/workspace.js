@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: workspace.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-10-04T16:34:07+05:30
+ * @Last modified time: 2018-11-10T01:32:35+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   const workspace = sequelize.define('workspace', {
     workspace_id: {
       type: DataTypes.STRING,
+      allowNull:false,
       primaryKey: true
     }
   }, {});
