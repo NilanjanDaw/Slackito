@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-08T21:37:00+05:30
+ * @Last modified time: 2018-11-10T04:21:27+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -101,19 +101,13 @@ router.post('/login', function (req, res, next) {
     }).then(user => {
       bcrypt.compare(password, user.password, function(err, result) {
         if (result) {
-          let payload = {
-            email_id: user.email_id,
-            workspace_id: user.workspace_id,
-            username: user.username
-          };
-          let token = jwt.sign(payload, config.jwt_secret);
-          res.status(200).json({
-            status: "success",
-            email_id: user.email_id,
-            workspace_id: user.workspace_id,
-            username: user.username,
-            token: token
-          });
+          user = user.dataValues
+          delete user.password
+          let token = jwt.sign(user, config.jwt_secret);
+          let payload = user
+          payload.token = token
+          payload.status = "success"
+          res.json(payload)
         } else {
           res.status(401).json({status: "authentication failed"})
         }
@@ -131,29 +125,24 @@ router.post('/register', function (req, res, next) {
   let workspace_id = req.body.workspace_id
   let email_id = req.body.email_id
   let password = req.body.password
+  let is_admin = req.body.is_admin? true: false
   if(username && workspace_id && email_id && password) {
     bcrypt.hash(password, config.salt_rounds, function(err, hash) {
       models.user.create({
-        username, workspace_id, email_id, password
+        username, workspace_id, email_id, password, is_admin
       }).then(user => {
-        let payload = {
-          email_id: user.email_id,
-          workspace_id: user.workspace_id,
-          username: user.username
-        };
-        let token = jwt.sign(payload, config.jwt_secret);
-        res.json({
-          status: "success",
-          email_id: user.email_id,
-          workspace_id: user.workspace_id,
-          username: user.username,
-          token
-        })
+        user = user.dataValues
+        delete user.password
+        let token = jwt.sign(user, config.jwt_secret);
+        let payload = user
+        payload.token = token
+        payload.status = "success"
+        res.json(payload)
       }).catch(error => {
         console.log(error);
         res.status(400).json({
           status: "failed",
-          message: "user account not created"
+          message: "user account not created " + err.parent.detail
         })
       })
     })

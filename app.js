@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: app.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-08T01:22:14+05:30
+ * @Last modified time: 2018-11-10T04:01:02+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -39,6 +39,7 @@ jwtOptions.secretOrKey = config.jwt_secret;
 
 var strategy = new JwtStrategy(
   jwtOptions, function (jwt_payload, next) {
+    console.log(jwt_payload);
       models.user.findOne({
         where: {
           email_id: jwt_payload.email_id,

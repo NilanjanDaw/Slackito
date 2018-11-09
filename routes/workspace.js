@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: workspace.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-08T00:37:40+05:30
+ * @Last modified time: 2018-11-10T04:23:47+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -12,6 +12,7 @@
  var router = express.Router();
  const config = require('.././config');
  const bcrypt = require('bcrypt');
+ const passport = require('passport');
  const jwt = require('jsonwebtoken');
 
 router.post('/new', function (req, res, next) {
@@ -31,22 +32,23 @@ router.post('/new', function (req, res, next) {
               email_id: decoded.email_id,
               workspace_id: workspace.workspace_id,
               username: req.body.username,
-              password: hash
+              password: hash,
+              is_admin: true
             }).then(user => {
-              let token = jwt.sign({
-                email_id: user.email_id,
-                workspace_id: user.workspace_id
-              }, config.jwt_secret)
-              res.json({
-                status: "success",
-                token
-              })
+              user = user.dataValues
+              delete user.password
+              let token = jwt.sign(user, config.jwt_secret);
+              let payload = user
+              payload.token = token
+              payload.status = "success"
+              res.json(payload)
             })
           });
         }).catch(err => {
-          console.log(err);
+          console.log(err.parent.detail);
           res.status(400).json({
-            status: "failed"
+            status: "failed",
+            message: err.parent.detail
           })
         })
       }
@@ -54,10 +56,10 @@ router.post('/new', function (req, res, next) {
   })
 })
 
-router.get('/list', function (req, res, next) {
+router.get('/list', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   models.user.findAll({
     where: {
-      email_id: req.query.email_id
+      email_id: req.user.email_id
     },
     attributes: ['workspace_id', 'username']
   }).then(users => {
@@ -71,7 +73,10 @@ router.get('/list', function (req, res, next) {
     })
   }).catch(err => {
     console.log(err);
-    res.status(500)
+    res.status(500).json({
+      status: "failed",
+      message: err.parent.detail
+    })
   })
 })
 

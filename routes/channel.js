@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: channel.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-08T01:24:08+05:30
+ * @Last modified time: 2018-11-10T04:27:22+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -14,19 +14,25 @@
  const passport = require('passport');
 
 router.post('/new', passport.authenticate('jwt', { session: false }), function (req, res, next) {
-  models.channel.create({
-    channel_name: req.body.channel_name,
-    workspace_id: req.user.workspace_id
-  }).then(channel => {
-    res.json({
-      status: "success",
-      channel
+  if (req.user.is_admin) {
+    models.channel.create({
+      channel_name: req.body.channel_name,
+      workspace_id: req.user.workspace_id
+    }).then(channel => {
+      res.json({
+        status: "success",
+        channel
+      })
+    }).catch(error => {
+      res.status(400).json({
+        status: "failed",
+      })
     })
-  }).catch(error => {
-    res.status(400).json({
-      status: "failed",
+  } else {
+    req.status(401).json({
+      status: "unauthorized"
     })
-  })
+  }
 })
 
 router.get('/list', passport.authenticate('jwt', { session: false }), function (req, res, next) {

@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: user.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T00:10:33+05:30
+ * @Last modified time: 2018-11-10T04:11:28+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -13,6 +13,12 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const user = sequelize.define('user', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
