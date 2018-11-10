@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: messages.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T16:47:25+05:30
+ * @Last modified time: 2018-11-11T04:02:03+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -27,15 +27,42 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage})
 
-router.post('/files/upload', upload.single('file'), function (req, res, next) {
+router.post('/files/upload', upload.single('file'),
+    passport.authenticate('jwt', { session: false }), function (req, res, next) {
   console.log(req.file);
-  res.json({
-    status: "success"
+  models.files.creare({
+    message_id: req.body.message_id,
+    filename: req.file.originalname,
+    filehash: req.file.filename
+  }).then(file => {
+    res.json({
+      status: "success"
+    })
   })
 })
 
-router.post('/files/download', function (req, res, next) {
-  res.download('uploads/' + req.body.filename)
+router.post('/files/download', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+  models.file.findOne({
+    where: {
+      message_id: req.body.message_id
+    }
+  }).then(file => {
+    res.download('uploads/' + file.filehash, file.filename)
+  })
+})
+
+router.post('/all', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+  models.messages.findAll({
+    where: {
+      workspace_id: req.user.workspace_id,
+      channel_name: req.body.channel_name
+    }
+  }).then(messages => {
+    req.json({
+      status: "success",
+      message: messages
+    })
+  })
 })
 
 module.exports = router;

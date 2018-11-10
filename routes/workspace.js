@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: workspace.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T04:23:47+05:30
+ * @Last modified time: 2018-11-11T00:24:37+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -41,7 +41,15 @@ router.post('/new', function (req, res, next) {
               let payload = user
               payload.token = token
               payload.status = "success"
-              res.json(payload)
+              models.user.findAll({
+                where: {
+                  email_id: decoded.email_id
+                },
+                attributes: ['workspace_id', 'username']
+              }).then(users => {
+                payload.details = users
+                res.json(payload)
+              })
             })
           });
         }).catch(err => {

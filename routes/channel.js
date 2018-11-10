@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: channel.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T15:00:51+05:30
+ * @Last modified time: 2018-11-10T17:11:50+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -36,32 +36,55 @@ router.post('/new', passport.authenticate('jwt', { session: false }), function (
 })
 
 router.get('/list', passport.authenticate('jwt', { session: false }), function (req, res, next) {
-  const Op = models.Sequelize.Op
-  models.channeluser.findAll({
-    where: {
-      user_id: req.user.id
-    }
-  }).then(channelusers => {
-    channel_id = []
-    for (channeluser of channelusers) {
-      channel_id.push(channeluser.channel_id)
-    }
 
+  if (req.user.is_admin) {
     models.channel.findAll({
       where: {
-        channel_id: {
-          [Op.or]: channel_id
-        }
+        workspace_id: req.user.workspace_id
       }
     }).then(channels => {
       res.json({
         status: "success",
         data: channels
+      }).then(err => {
+        console.log(err);
+        res.status(400).json({
+          status: "failed"
+        })
       })
     })
-  }).catch(err => {
-    console.log(err);
-  })
+  } else {
+    const Op = models.Sequelize.Op
+    models.channeluser.findAll({
+      where: {
+        user_id: req.user.id
+      }
+    }).then(channelusers => {
+      channel_id = []
+      for (channeluser of channelusers) {
+        channel_id.push(channeluser.channel_id)
+      }
+
+      models.channel.findAll({
+        where: {
+          channel_id: {
+            [Op.or]: channel_id
+          }
+        }
+      }).then(channels => {
+        res.json({
+          status: "success",
+          data: channels
+        })
+      })
+    }).catch(err => {
+      console.log(err);
+      res.status(400).json({
+        status: "failed"
+      })
+    })
+  }
+
 })
 
  module.exports = router;

@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T04:21:27+05:30
+ * @Last modified time: 2018-11-11T04:56:39+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -107,7 +107,15 @@ router.post('/login', function (req, res, next) {
           let payload = user
           payload.token = token
           payload.status = "success"
-          res.json(payload)
+          models.user.findAll({
+            where: {
+              email_id
+            },
+            attributes: ['workspace_id', 'username']
+          }).then(users => {
+            payload.details = users
+            res.json(payload)
+          })
         } else {
           res.status(401).json({status: "authentication failed"})
         }
@@ -159,6 +167,7 @@ router.post('/password/set', function (req, res, next) {
     let email_id = req.body.email_id;
     let password = req.body.password;
     let workspace_id = req.body.workspace_id;
+    console.log(req.body);
     bcrypt.hash(password, config.salt_rounds, function(err, hash) {
         models.user.update({
           password: hash
@@ -168,7 +177,7 @@ router.post('/password/set', function (req, res, next) {
           }
         }).then(user =>{
           res.json({
-            status: "successs"
+            status: "success"
           })
         }).catch(error => {
           console.log(error);
