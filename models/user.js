@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: user.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T04:11:28+05:30
+ * @Last modified time: 2018-11-10T14:59:34+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -41,7 +41,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   user.associate = function(models) {
-    // associations can be defined here
+    // models.user.belongsToMany(models.channel, {
+    //   through: models.channeluser,
+    //   unique: false,
+    //   as: 'channels',
+    //   foreignkey: 'user_id',
+    //   otherKey: 'user_id'
+    // })
   };
   return user;
 };

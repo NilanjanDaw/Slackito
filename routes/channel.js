@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: channel.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T04:27:22+05:30
+ * @Last modified time: 2018-11-10T15:00:51+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -36,24 +36,31 @@ router.post('/new', passport.authenticate('jwt', { session: false }), function (
 })
 
 router.get('/list', passport.authenticate('jwt', { session: false }), function (req, res, next) {
-  models.channel.findAll({
+  const Op = models.Sequelize.Op
+  models.channeluser.findAll({
     where: {
-      workspace_id: req.user.dataValues.workspace_id
+      user_id: req.user.id
     }
-  }).then(channels => {
-    data = []
-    for (channel of channels) {
-      data.push(channel.dataValues)
+  }).then(channelusers => {
+    channel_id = []
+    for (channeluser of channelusers) {
+      channel_id.push(channeluser.channel_id)
     }
-    res.json({
-      status: "success",
-      details: data
+
+    models.channel.findAll({
+      where: {
+        channel_id: {
+          [Op.or]: channel_id
+        }
+      }
+    }).then(channels => {
+      res.json({
+        status: "success",
+        data: channels
+      })
     })
   }).catch(err => {
     console.log(err);
-    res.status(400).json({
-      status: "failed"
-    })
   })
 })
 

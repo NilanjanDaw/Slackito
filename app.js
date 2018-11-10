@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: app.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T04:01:02+05:30
+ * @Last modified time: 2018-11-10T16:24:37+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -27,7 +27,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var workspaceRouter = require('./routes/workspace');
 var channelRouter = require('./routes/channel');
-
+var messageRouter = require('./routes/messages');
 var app = express();
 
 var ExtractJwt = passportJWT.ExtractJwt;
@@ -39,7 +39,6 @@ jwtOptions.secretOrKey = config.jwt_secret;
 
 var strategy = new JwtStrategy(
   jwtOptions, function (jwt_payload, next) {
-    console.log(jwt_payload);
       models.user.findOne({
         where: {
           email_id: jwt_payload.email_id,
@@ -70,7 +69,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/workspaces', workspaceRouter);
 app.use('/channels', channelRouter);
-
+app.use('/messages', messageRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
