@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: workspace.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-11T16:38:29+05:30
+ * @Last modified time: 2018-11-11T23:17:14+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -35,33 +35,22 @@ router.post('/new', function (req, res, next) {
               password: hash,
               is_admin: true
             }).then(user => {
-
-              models.channel.findOrCreate({
-                where: { workspace_id: workspace.workspace_id, channel_name: user.username }
-              }).spread((channel, created) => {
-                models.channeluser.findOrCreate({
-                  where: { channel_id: channel.id, user_id: user.id }
-                }).spread((channeluser, created) => {
-                  console.log(channeluser.dataValues);
-                  user = user.dataValues
-                  delete user.password
-                  let token = jwt.sign(user, config.jwt_secret);
-                  let payload = user
-                  payload.token = token
-                  payload.status = "success"
-                  models.user.findAll({
-                    where: {
-                      email_id: decoded.email_id
-                    },
-                    attributes: ['workspace_id', 'username']
-                  }).then(users => {
-                    payload.details = users
-                    res.json(payload)
-                  })
-                })
+              user = user.dataValues
+              delete user.password
+              let token = jwt.sign(user, config.jwt_secret);
+              let payload = user
+              payload.token = token
+              payload.status = "success"
+              models.user.findAll({
+                where: {
+                  email_id: decoded.email_id
+                },
+                attributes: ['workspace_id', 'username']
+              }).then(users => {
+                payload.details = users
+                res.json(payload)
               })
-            })
-          });
+          })
         }).catch(err => {
           console.log(err.parent.detail);
           res.status(400).json({
@@ -69,8 +58,9 @@ router.post('/new', function (req, res, next) {
             message: err.parent.detail
           })
         })
-      }
+      })
     }
+  }
   })
 })
 

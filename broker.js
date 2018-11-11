@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: broker.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-08T22:15:46+05:30
+ * @Last modified time: 2018-11-11T22:46:08+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -46,6 +46,9 @@ var authenticate = function(client, username, password, callback) {
 
 var authorizePublish = function(client, topic, payload, callback) {
   payload = JSON.parse(payload.toString())
+  console.log(payload, client.user.workspace_id === topic.split('/')[0] &&
+                 client.user.username === payload.from &&
+                 client.user.workspace_id === payload.workspace_id);
   callback(null, client.user.workspace_id === topic.split('/')[0] &&
                  client.user.username === payload.from &&
                  client.user.workspace_id === payload.workspace_id);

@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-11T16:19:04+05:30
+ * @Last modified time: 2018-11-11T23:05:15+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -186,7 +186,7 @@ router.post('/login', function (req, res, next) {
 })
 
 router.post('/join', function (req, res, next) {
-  
+
   let username = req.body.username
   let workspace_id = req.body.workspace_id
   let email_id = req.body.email_id
@@ -206,17 +206,9 @@ router.post('/join', function (req, res, next) {
           models.channeluser.findOrCreate({
             where: { user_id: user.id, channel_id: channel.id }
           }).spread((channeluser, created) => {
-            models.channel.findOrCreate({
-              where: { workspace_id, channel_name: username }
-            }).spread((channel, created) => {
-              models.channeluser.findOrCreate({
-                where: { channel_id: channel.id, user_id: user.id }
-              }).spread((channeluser, created) => { res.render('success.handlebars', { username }) })
+               res.render('success.handlebars', { username })
             })
           })
-
-
-        })
       }).catch(error => {
         console.log(error);
         res.status(400).json({

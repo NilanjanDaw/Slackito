@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: channel.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-11T16:32:54+05:30
+ * @Last modified time: 2018-11-11T23:43:15+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -95,7 +95,26 @@ router.get('/list', passport.authenticate('jwt', { session: false }), function (
       })
     })
   }
+})
 
+router.post('/delete', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+  if (req.user.is_admin) {
+    models.channel.destroy({
+      where: {
+        channel_name: req.body.channel_name,
+        workspace_id: req.user.workspace_id
+      }
+    }).then(deleted => {
+      res.json({
+        deleted
+      })
+    }).catch(err => {
+      res.status(400).json({
+        status: "failed",
+        details: err.parent.detail
+      })
+    })
+  }
 })
 
  module.exports = router;
