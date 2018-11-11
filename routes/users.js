@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-11T04:56:39+05:30
+ * @Last modified time: 2018-11-11T06:46:13+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -16,6 +16,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const config = require('.././config');
+const passport = require('passport');
 let router = express.Router();
 
 let transporter = nodemailer.createTransport({
@@ -25,6 +26,59 @@ let transporter = nodemailer.createTransport({
         pass: 'cs699slack'
     }
 });
+
+
+router.post('/invite', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+  let inviteMail = req.body.email_id
+
+  let token = jwt.sign({
+    invite_mail: inviteMail,
+    workspace_id: req.user.workspace_id
+  }, config.jwt_secret)
+  const mailOptions = {
+    from: 'slackitoslack@gmail.com',
+    to: req.body.email_id,
+    subject: 'Email Verification for Slackito',
+    html: `<p> Hi! <b>${inviteMail}</b>, <br />
+    ${req.user.username} has invited you to join his <b>${req.user.workspace_id}</b> workspace on Slackito.
+    Please click on the link below to accept the invitation. <br />
+    http://${config.server_url}/users/invite/accept?token=${token}</p> <br />
+    Thanks, <br/>
+    Team <b>Slackito<b>`
+  };
+
+  transporter.sendMail(mailOptions, function (err, info) {
+     if(err) {
+       console.log(err);
+       res.json({
+         "status": "failed",
+         "message": err
+       })
+     }
+     else {
+       res.json({
+         "status": "success"
+       })
+       console.log(info);
+     }
+   });
+})
+
+router.get('/invite/accept', function (req, res, next) {
+
+  jwt.verify(req.query.token, config.jwt_secret, function(err, decoded) {
+    if (err) {
+      res.status(401).json({
+        status: "authentication failed"
+      })
+    } else {
+      res.render('invite.handlebars', {
+        email_id: decoded.invite_mail,
+        workspace_id: decoded.workspace_id
+      })
+    }
+  })
+})
 
 router.post('/confirm', function (req, res, next) {
   let token = jwt.sign(req.body.email_id, config.jwt_secret);
@@ -128,7 +182,8 @@ router.post('/login', function (req, res, next) {
   }
 })
 
-router.post('/register', function (req, res, next) {
+router.post('/join', function (req, res, next) {
+  console.log(req.body);
   let username = req.body.username
   let workspace_id = req.body.workspace_id
   let email_id = req.body.email_id
@@ -139,13 +194,9 @@ router.post('/register', function (req, res, next) {
       models.user.create({
         username, workspace_id, email_id, password, is_admin
       }).then(user => {
-        user = user.dataValues
-        delete user.password
-        let token = jwt.sign(user, config.jwt_secret);
-        let payload = user
-        payload.token = token
-        payload.status = "success"
-        res.json(payload)
+        res.render('success.handlebars', {
+          username
+        })
       }).catch(error => {
         console.log(error);
         res.status(400).json({

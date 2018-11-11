@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: app.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T16:24:37+05:30
+ * @Last modified time: 2018-11-11T06:29:21+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -22,6 +22,7 @@ var helmet = require('helmet');
 const config = require('./config.json');
 var broker = require('./broker')
 const models = require('./models');
+var exphbs  = require('express-handlebars');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -57,7 +58,9 @@ app.use(helmet())
 app.use(passport.initialize())
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
+app.engine('handlebars', exphbs());
 app.set('view engine', 'pug');
+app.set('view engine', 'handlebars');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -83,7 +86,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render('error.pug');
 });
 
 console.log("HTTP server is up and running");
