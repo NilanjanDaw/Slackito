@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: workspace.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-11T00:24:37+05:30
+ * @Last modified time: 2018-11-11T16:38:29+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -35,20 +35,30 @@ router.post('/new', function (req, res, next) {
               password: hash,
               is_admin: true
             }).then(user => {
-              user = user.dataValues
-              delete user.password
-              let token = jwt.sign(user, config.jwt_secret);
-              let payload = user
-              payload.token = token
-              payload.status = "success"
-              models.user.findAll({
-                where: {
-                  email_id: decoded.email_id
-                },
-                attributes: ['workspace_id', 'username']
-              }).then(users => {
-                payload.details = users
-                res.json(payload)
+
+              models.channel.findOrCreate({
+                where: { workspace_id: workspace.workspace_id, channel_name: user.username }
+              }).spread((channel, created) => {
+                models.channeluser.findOrCreate({
+                  where: { channel_id: channel.id, user_id: user.id }
+                }).spread((channeluser, created) => {
+                  console.log(channeluser.dataValues);
+                  user = user.dataValues
+                  delete user.password
+                  let token = jwt.sign(user, config.jwt_secret);
+                  let payload = user
+                  payload.token = token
+                  payload.status = "success"
+                  models.user.findAll({
+                    where: {
+                      email_id: decoded.email_id
+                    },
+                    attributes: ['workspace_id', 'username']
+                  }).then(users => {
+                    payload.details = users
+                    res.json(payload)
+                  })
+                })
               })
             })
           });
@@ -87,5 +97,30 @@ router.get('/list', passport.authenticate('jwt', { session: false }), function (
     })
   })
 })
+
+router.get('/users/list', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+  models.user.findAll({
+    where: {
+      workspace_id: req.user.workspace_id
+    },
+    attributes: ['id', 'username', 'is_admin']
+  }).then(users => {
+    data = []
+    for (user of users) {
+      data.push(user.dataValues)
+    }
+    res.json({
+      status: "success",
+      users: data
+    })
+  }).catch(err => {
+    console.log(err);
+    res.status(500).json({
+      status: "failed",
+      message: err.parent.detail
+    })
+  })
+})
+
 
  module.exports = router;

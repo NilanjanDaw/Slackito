@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: channel.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-10T17:11:50+05:30
+ * @Last modified time: 2018-11-11T16:32:54+05:30
  * @Copyright: Nilanjan Daw
  */
  var express = require('express');
@@ -19,6 +19,9 @@ router.post('/new', passport.authenticate('jwt', { session: false }), function (
       channel_name: req.body.channel_name,
       workspace_id: req.user.workspace_id
     }).then(channel => {
+      models.channeluser.create({
+        channel_id: channel.id, user_id: req.user.id
+      })
       res.json({
         status: "success",
         channel
@@ -43,16 +46,20 @@ router.get('/list', passport.authenticate('jwt', { session: false }), function (
         workspace_id: req.user.workspace_id
       }
     }).then(channels => {
-      res.json({
-        status: "success",
-        data: channels
-      }).then(err => {
-        console.log(err);
-        res.status(400).json({
-          status: "failed"
+
+        channelList = []
+        for (channel of channels) {
+          channelList.push(channel.channel_name)
+        }
+        res.json({
+          status: "success",
+          channels: channelList
         })
+
+      }).catch(err => {
+        console.log(err);
+        res.status(400).json({ status: "failed" })
       })
-    })
   } else {
     const Op = models.Sequelize.Op
     models.channeluser.findAll({
@@ -67,14 +74,18 @@ router.get('/list', passport.authenticate('jwt', { session: false }), function (
 
       models.channel.findAll({
         where: {
-          channel_id: {
+          id: {
             [Op.or]: channel_id
           }
         }
       }).then(channels => {
+        channelList = []
+        for (channel of channels) {
+          channelList.push(channel.channel_name)
+        }
         res.json({
           status: "success",
-          data: channels
+          channels: channelList
         })
       })
     }).catch(err => {

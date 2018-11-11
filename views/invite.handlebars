@@ -4,7 +4,7 @@
 @Email:  nilanjandaw@gmail.com
 @Filename: invite.hbs
 @Last modified by:   nilanjan
-@Last modified time: 2018-11-11T06:40:34+05:30
+@Last modified time: 2018-11-11T06:59:55+05:30
 @Copyright: Nilanjan Daw
 -->
 <!DOCTYPE html>
@@ -18,10 +18,11 @@
   <body>
     <form class="form-signin" method="post" action="/users/join">
       <h1 class="h3 mb-3 font-weight-normal">Please Accept Your Invitation</h1>
-      <label for="inputEmail" class="sr-only">Email address</label>
+      <label for="email_id" class="sr-only">Email address</label>
       <input type="email" id="email_id" name="email_id" class="form-control" value="{{email_id}}" readonly>
       <!-- <label for="inputEmail" class="sr-only">Workspace</label> -->
-      <input type="email" id="workspace_id" name="workspace_id" class="form-control" value="{{workspace_id}}" readonly>
+      <input type="text" id="workspace_id" name="workspace_id" class="form-control" value="{{workspace_id}}" readonly>
+      <input type="text" id="channel_name" name="channel_name" class="form-control" value="{{channel_name}}" readonly>
       <label for="username" class="sr-only">username</label>
       <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required autofocus>
       <label for="inputPassword" class="sr-only">Password</label>

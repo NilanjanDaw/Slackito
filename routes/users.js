@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: users.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-11T06:46:13+05:30
+ * @Last modified time: 2018-11-11T16:19:04+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -30,15 +30,17 @@ let transporter = nodemailer.createTransport({
 
 router.post('/invite', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   let inviteMail = req.body.email_id
-
+  let channel_name = req.body.channel_name
+  console.log(req.body);
   let token = jwt.sign({
     invite_mail: inviteMail,
-    workspace_id: req.user.workspace_id
+    workspace_id: req.user.workspace_id,
+    channel_name
   }, config.jwt_secret)
   const mailOptions = {
     from: 'slackitoslack@gmail.com',
-    to: req.body.email_id,
-    subject: 'Email Verification for Slackito',
+    to: inviteMail,
+    subject: 'Invitation to Slackito',
     html: `<p> Hi! <b>${inviteMail}</b>, <br />
     ${req.user.username} has invited you to join his <b>${req.user.workspace_id}</b> workspace on Slackito.
     Please click on the link below to accept the invitation. <br />
@@ -50,7 +52,7 @@ router.post('/invite', passport.authenticate('jwt', { session: false }), functio
   transporter.sendMail(mailOptions, function (err, info) {
      if(err) {
        console.log(err);
-       res.json({
+       res.status(400).json({
          "status": "failed",
          "message": err
        })
@@ -74,7 +76,8 @@ router.get('/invite/accept', function (req, res, next) {
     } else {
       res.render('invite.handlebars', {
         email_id: decoded.invite_mail,
-        workspace_id: decoded.workspace_id
+        workspace_id: decoded.workspace_id,
+        channel_name: decoded.channel_name
       })
     }
   })
@@ -183,19 +186,36 @@ router.post('/login', function (req, res, next) {
 })
 
 router.post('/join', function (req, res, next) {
-  console.log(req.body);
+  
   let username = req.body.username
   let workspace_id = req.body.workspace_id
   let email_id = req.body.email_id
   let password = req.body.password
-  let is_admin = req.body.is_admin? true: false
+  let channel_name = req.body.channel_name
   if(username && workspace_id && email_id && password) {
     bcrypt.hash(password, config.salt_rounds, function(err, hash) {
-      models.user.create({
-        username, workspace_id, email_id, password, is_admin
-      }).then(user => {
-        res.render('success.handlebars', {
-          username
+      models.user.findOrCreate({defaults: {
+        username, workspace_id, email_id, password: hash
+      }, where: {
+        email_id, workspace_id
+      }}).spread((user, created) => {
+
+        models.channel.findOne({
+          where: { workspace_id, channel_name }
+        }).then(channel => {
+          models.channeluser.findOrCreate({
+            where: { user_id: user.id, channel_id: channel.id }
+          }).spread((channeluser, created) => {
+            models.channel.findOrCreate({
+              where: { workspace_id, channel_name: username }
+            }).spread((channel, created) => {
+              models.channeluser.findOrCreate({
+                where: { channel_id: channel.id, user_id: user.id }
+              }).spread((channeluser, created) => { res.render('success.handlebars', { username }) })
+            })
+          })
+
+
         })
       }).catch(error => {
         console.log(error);
