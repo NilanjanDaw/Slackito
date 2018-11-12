@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: messages.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-11T23:42:24+05:30
+ * @Last modified time: 2018-11-12T15:39:11+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -67,13 +67,14 @@ router.post('/all', passport.authenticate('jwt', { session: false }), function (
 
 
 router.post('/update', passport.authenticate('jwt', { session: false }), function (req, res, next) {
-  models.messages.update({body: req.body.body}, {
+  models.message.update({body: req.body.body}, {
     returning: true,
     where: {
       id: req.body.id
     }
   }).then(function ([rowsUpdated, [updatedMessages]]) {
     res.json({
+      status: "success",
       updatedMessages
     })
   }).catch(err => {
@@ -85,12 +86,13 @@ router.post('/update', passport.authenticate('jwt', { session: false }), functio
 })
 
 router.post('/delete', passport.authenticate('jwt', { session: false }), function (req, res, next) {
-  models.messages.destroy({
+  models.message.destroy({
     where: {
       id: req.body.id
     }
   }).then(deleted => {
     res.json({
+      status: "success",
       deleted
     })
   }).catch(err => {
