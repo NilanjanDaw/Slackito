@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: broker.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-11T22:46:08+05:30
+ * @Last modified time: 2018-11-12T15:59:22+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -46,9 +46,6 @@ var authenticate = function(client, username, password, callback) {
 
 var authorizePublish = function(client, topic, payload, callback) {
   payload = JSON.parse(payload.toString())
-  console.log(payload, client.user.workspace_id === topic.split('/')[0] &&
-                 client.user.username === payload.from &&
-                 client.user.workspace_id === payload.workspace_id);
   callback(null, client.user.workspace_id === topic.split('/')[0] &&
                  client.user.username === payload.from &&
                  client.user.workspace_id === payload.workspace_id);
@@ -74,11 +71,28 @@ server.on('published', function(packet, client) {
   if (!packet.topic.startsWith("$SYS/")) {
     let payload = packet.payload.toString()
     payload = JSON.parse(payload)
-    models.message
-      .create(payload)
-      .catch(err => {
-        console.log(err);
-      })
+    if (payload.type !== "edit" && payload.type !== "delete") {
+      models.message
+        .create(payload)
+        .catch(err => {
+          console.log(err.parent.detail);
+        })
+    } else {
+      if (payload.type === "edit") {
+        models.message.update({body: payload.body}, {
+          returning: true,
+          where: {
+            id: payload.id
+          }
+        })
+      } else if (payload.type === "delete") {
+        models.message.destroy({
+          where: {
+            id: payload.id
+          }
+        })
+      }
+    }
   }
 });
 

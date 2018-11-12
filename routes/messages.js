@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: messages.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-12T15:39:11+05:30
+ * @Last modified time: 2018-11-12T16:09:58+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -52,15 +52,15 @@ router.post('/files/download', passport.authenticate('jwt', { session: false }),
 })
 
 router.post('/all', passport.authenticate('jwt', { session: false }), function (req, res, next) {
-  models.messages.findAll({
+  models.message.findAll({
     where: {
       workspace_id: req.user.workspace_id,
       channel_name: req.body.channel_name
     }
   }).then(messages => {
-    req.json({
+    res.json({
       status: "success",
-      message: messages
+      messages: messages
     })
   })
 })
@@ -77,6 +77,7 @@ router.post('/update', passport.authenticate('jwt', { session: false }), functio
       status: "success",
       updatedMessages
     })
+
   }).catch(err => {
     res.status(400).json({
       status: "failed",
