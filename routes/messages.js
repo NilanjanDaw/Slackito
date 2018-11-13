@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: messages.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-12T16:09:58+05:30
+ * @Last modified time: 2018-11-13T14:17:46+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -28,23 +28,29 @@ const storage = multer.diskStorage({
 const upload = multer({storage})
 
 router.post('/files/upload', upload.single('file'),
-    passport.authenticate('jwt', { session: false }), function (req, res, next) {
+     passport.authenticate('jwt', { session: false }), function (req, res, next) {
   console.log(req.file);
-  models.files.creare({
-    message_id: req.body.message_id,
-    filename: req.file.originalname,
-    filehash: req.file.filename
-  }).then(file => {
-    res.json({
-      status: "success"
+  if (file)
+    models.file.create({
+      message_id: req.body.message_id,
+      filename: req.file.originalname,
+      filehash: req.file.filename
+    }).then(file => {
+      res.json({
+        status: "success"
+      })
     })
-  })
+  else {
+    res.status(400).json({
+      status: "failed"
+    })
+  }
 })
 
-router.post('/files/download', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+router.get('/files/download/', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   models.file.findOne({
     where: {
-      message_id: req.body.message_id
+      message_id: req.query.message_id
     }
   }).then(file => {
     res.download('uploads/' + file.filehash, file.filename)
@@ -65,6 +71,19 @@ router.post('/all', passport.authenticate('jwt', { session: false }), function (
   })
 })
 
+router.post('/users/all', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+
+  let query = `select * from messages where workspace_id='${req.user.workspace_id}' and
+      channel_name='${req.body.channel_name}' and "from"='${req.user.username}' or
+      channel_name='${req.user.username}' and "from"='${req.body.channel_name}' order by "createdAt"`
+  models.sequelize.query(query,
+      { type: models.sequelize.QueryTypes.SELECT}).then(messages => {
+        res.json({
+          status: "success",
+          messages: messages
+        })
+      })
+})
 
 router.post('/update', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   models.message.update({body: req.body.body}, {
