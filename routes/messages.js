@@ -4,7 +4,7 @@
  * @Email:  nilanjandaw@gmail.com
  * @Filename: messages.js
  * @Last modified by:   nilanjan
- * @Last modified time: 2018-11-13T14:17:46+05:30
+ * @Last modified time: 2018-11-21T20:41:06+05:30
  * @Copyright: Nilanjan Daw
  */
 
@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage})
 
-router.post('/files/upload', upload.single('file'),
+router.post('/files/upload', passport.authenticate('jwt', { session: false }),upload.single('file'),
      passport.authenticate('jwt', { session: false }), function (req, res, next) {
   console.log(req.file);
   if (file)
@@ -47,10 +47,10 @@ router.post('/files/upload', upload.single('file'),
   }
 })
 
-router.get('/files/download/', passport.authenticate('jwt', { session: false }), function (req, res, next) {
+router.get('/files/download/:message_id', passport.authenticate('jwt', { session: false }), function (req, res, next) {
   models.file.findOne({
     where: {
-      message_id: req.query.message_id
+      message_id: req.params.message_id
     }
   }).then(file => {
     res.download('uploads/' + file.filehash, file.filename)
