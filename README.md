@@ -1,4 +1,4 @@
-# Slack
+# Slackito
 ## Backend server for the messaging system
 
 ### Important Links
@@ -21,7 +21,7 @@
 
 #### Brokers
 - [https://mosquitto.org/](https://mosquitto.org/) (MQTT)
-- [https://github.com/mcollina/mosca](https://github.com/mcollina/mosca) (MQTT) [We plan to use this]
+- [https://github.com/mcollina/mosca](https://github.com/mcollina/mosca) (MQTT)
 - [https://www.rabbitmq.com/](https://www.rabbitmq.com/) (AMQP / MQTT)
 
 #### Protocols:
